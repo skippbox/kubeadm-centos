@@ -8,63 +8,26 @@
 #     end_port: 4001
 #     user_security_group: "{{ k8s_security_group_name }}"
 
-# Rules for the k8s security group
+- name: add internal security group rules
+  cs_securitygroup_rule:
+    security_group: "{{ k8s_security_group_name }}"
+    start_port: "{{ item.port }}"
+    end_port: "{{ item.port }}"
+    protocol: "{{ item.proto | default('tcp') }}"
+    user_security_group: "{{ k8s_security_group_name }}"
+  with_items:
+  - port: 2379 # etcd
+  - port: 2380 # etcd
+  - port: 8080
+  - port: 8472
+    proto: udp
+  - port: 10250
 
-# internal
-  - name: flannel etcd 2379
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 2379
-     end_port: 2379
-     user_security_group: "{{ k8s_security_group_name }}"
-
-  - name: flannel etcd 2380
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 2380
-     end_port: 2380
-     user_security_group: "{{ k8s_security_group_name }}"
-
-  - name: k8s 8080
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 8080
-     end_port: 8080
-     user_security_group: "{{ k8s_security_group_name }}"
-
-  - name: flannel UDP 8472
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 8472
-     end_port: 8472
-     protocol: udp
-     user_security_group: "{{ k8s_security_group_name }}"
-
-  - name: kubelet logs and exec TCP 10250
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 10250
-     end_port: 10250
-     protocol: tcp
-     user_security_group: "{{ k8s_security_group_name }}"
-
-# external access
-
-  - name: SSH for k8s
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 22
-     end_port: 22
-
-  - name: k8s public secure
-    local_action:
-     module: cs_securitygroup_rule
-     security_group: "{{ k8s_security_group_name }}"
-     start_port: 443
-     end_port: 443
+- name: add external security group rules
+  cs_securitygroup_rule:
+    security_group: "{{ k8s_security_group_name }}"
+    start_port: "{{ item.port }}"
+    end_port: "{{ item.port }}"
+  with_items:
+  - port: 22 # ssh
+  - port: 443 # https

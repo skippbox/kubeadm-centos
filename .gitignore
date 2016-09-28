@@ -1,0 +1,3 @@
+# Local environment specific variables
+vars/local_config.yml
+vars/secrets.yml
