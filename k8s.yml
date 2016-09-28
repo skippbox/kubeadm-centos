@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    ssh_key: k8s
+    k8s_version: 1.4.0
+    k8s_num_nodes: 2
+    k8s_security_group_name: k8s
+    k8s_node_prefix: kube
+    k8s_username: foobar
+    k8s_password: FdKPSuwQ
+# This template name is specific to http://exoscale.ch, replace it
+    k8s_template: Linux CentOS 7.1 64-bit 50G Disk (2015-03-31-2230b6) 
+    k8s_instance_type: Tiny
+
+  roles:
+    - common
+    - k8s

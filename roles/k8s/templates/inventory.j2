@@ -1,0 +1,20 @@
+[default]
+# localhost ansible_python_interpreter=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+
+[master]
+master_node ansible_host={{ k8s_master.default_ip }} ansible_ssh_private_key_file=~/.ssh/id_rsa_k8s ansible_ssh_user=centos
+
+[nodes]
+{% for item in k8s_nodes.results %}
+{{ item.default_ip }}
+{% endfor %}
+
+[allnodes]
+{{ k8s_master.default_ip }}
+{% for item in k8s_nodes.results %}
+{{ item.default_ip }}
+{% endfor %}
+
+[nodes:vars]
+ansible_ssh_user=centos
+ansible_ssh_private_key_file=~/.ssh/id_rsa_{{ ssh_key }}

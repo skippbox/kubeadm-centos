@@ -1,0 +1,18 @@
+[default]
+# localhost ansible_python_interpreter=/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+
+[master]
+master_node ansible_host=185.19.30.97 ansible_ssh_private_key_file=~/.ssh/id_rsa_k8s ansible_ssh_user=centos
+
+[nodes]
+185.19.30.212
+185.19.30.213
+
+[allnodes]
+185.19.30.97
+185.19.30.212
+185.19.30.213
+
+[nodes:vars]
+ansible_ssh_user=centos
+ansible_ssh_private_key_file=~/.ssh/id_rsa_k8s

@@ -1,0 +1,37 @@
+---
+- hosts: master
+  vars:
+    init_token: foobar.1234
+  tasks:
+  - name: Disable selinux
+    selinux: state=disabled
+    become: true
+  - name: Start Docker
+    service: enabled=yes state=started name=docker
+    become: true
+  - name: Start Kubelet
+    service: enabled=yes state=started name=kubelet
+    become: true
+  - name: Run Kubeadm master
+    command: kubeadm init --token {{ init_token }} 
+    become: true
+
+- hosts: nodes
+  vars:
+    init_token: foobar.1234
+  tags: nodes
+  tasks:
+  - name: Disable selinux
+    selinux: state=disabled
+    become: true
+  - name: Start Docker
+    service: enabled=yes state=started name=docker
+    become: true
+  - name: Start Kubelet
+    service: enabled=yes state=started name=kubelet
+    become: true
+  - name: Debug master_node IP
+    debug: msg='master node IP is {{ hostvars['master_node'].ansible_default_ipv4.address }}'
+  - name: Run Kubeadm nodes
+    command: kubeadm join --token {{ init_token }} {{ hostvars['master_node'].ansible_default_ipv4.address }}
+    become: true

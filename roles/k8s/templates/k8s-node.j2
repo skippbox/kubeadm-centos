@@ -1,0 +1,23 @@
+#cloud-config
+write_files:
+  - path: /etc/yum.repos.d/kubernetes.repo
+    content: |
+      [kubernetes]
+      name=Kubernetes
+      baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+             https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+package_update: true
+
+packages:
+ - docker
+ - kubelet
+ - kubeadm
+ - kubectl
+ - kubernetes-cni
+
+power_state:
+  mode: reboot
