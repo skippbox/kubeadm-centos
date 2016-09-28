@@ -1,0 +1,6 @@
+- name: install ssh key
+  copy:
+    content: "{{ key.private_key }}"
+    dest: "~/.ssh/id_rsa_{{ ssh_key }}"
+    mode: 0600
+  tags: sshkey

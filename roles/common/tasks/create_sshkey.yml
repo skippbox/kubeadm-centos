@@ -1,18 +1,19 @@
-  - name: Create SSH Key
-    local_action:
-      module: cs_sshkeypair
-      name: "{{ ssh_key }}"
-    register: key
-    tags: sshkey
+- name: check if ssh key exists
+  stat:
+    path: "~/.ssh/id_rsa_{{ ssh_key }}"
+  register: stat_ssh_key
+  tags: sshkey
 
-  - debug: msg='private key is {{ key.private_key }}'
-    when: key.changed
-    tags: sshkey
- 
-  - local_action: copy content="{{ key.private_key }}" dest="~/.ssh/id_rsa_{{ ssh_key }}"
-    when: key.changed
-    tags: sshkey
+- name: Create SSH Key
+  cs_sshkeypair:
+    name: "{{ ssh_key }}"
+  register: key
+  when: "{{ not stat_ssh_key.stat.exists }}"
+  notify: install ssh key
+  tags: sshkey
 
-  - file: path="~/.ssh/id_rsa_{{ ssh_key }}" mode=0600
-    when: key.changed
-    tags: sshkey
+- debug:
+    msg: 'private key is {{ key.private_key }}'
+    verbosity: 2
+  when: not key|skipped
+  tags: sshkey
