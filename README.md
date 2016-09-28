@@ -9,9 +9,15 @@ If I have time I will modify the plays to run on AWS as well.
 Create a Kubernetes cluster
 ---------------------------
 
+Copy `vars/local_config.yml.example` to `vars/local_config.yml` and
+update to your needs. These will be ignored by git so you can update
+as you need. Similarly, copy `vars/secrets.yml.example` to `vars/secrets.yml`
+and then use the `ansible-vault` tool to encrypt it, if you need to protect
+it (you'll need to pass `--ask-vault-pass` when running the playbook if you
+do this).
+
     $ ansible-playbook k8s.yml
 
-Some variables can be edited in the `k8s.yml` file.
 This will start a Kubernetes master node and a number of compute nodes.
 
 Check the tasks and templates in `roles/k8s`.
