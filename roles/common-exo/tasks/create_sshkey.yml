@@ -1,0 +1,19 @@
+- name: check if ssh key exists
+  stat:
+    path: "~/.ssh/id_rsa_{{ ssh_key }}"
+  register: stat_ssh_key
+  tags: sshkey
+
+- name: Create SSH Key
+  cs_sshkeypair:
+    name: "{{ ssh_key }}"
+  register: key
+  when: "{{ not stat_ssh_key.stat.exists }}"
+  notify: install ssh key
+  tags: sshkey
+
+- debug:
+    msg: 'private key is {{ key.private_key }}'
+    verbosity: 2
+  when: not key|skipped
+  tags: sshkey

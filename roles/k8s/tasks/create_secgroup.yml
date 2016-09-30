@@ -1,6 +1,37 @@
-# Create k8s security group
+# Create k8s security group and rules
 
-- name: Create k8s Security Group
-  cs_securitygroup:
-    name: "{{ k8s_security_group_name }}"
-    description: k8s
+  - name: Create k8s Security Group
+    ec2_group:
+      name: "{{ k8s_security_group_name }}" 
+      description: k8s 
+      region: "{{ aws_region }}"
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 2377
+          to_port: 2377
+          group_name: "{{ k8s_security_group_name }}"
+        - proto: udp
+          from_port: 4789
+          to_port: 4789
+          group_name: "{{ k8s_security_group_name }}"
+        - proto: tcp
+          from_port: 7946
+          to_port: 7946
+          group_name: "{{ k8s_security_group_name }}"
+        - proto: udp
+          from_port: 7946
+          to_port: 7946
+          group_name: "{{ k8s_security_group_name }}"
+      rules_egress:
+        - proto: udp
+          from_port: 8472
+          to_port: 8472
+          group_name: "{{ k8s_security_group_name }}"
+        - proto: tcp
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0

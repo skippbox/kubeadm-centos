@@ -1,26 +1,40 @@
-- name: Start k8s head node
-  cs_instance:
-    name: "{{ k8s_node_prefix }}-head"
-    template: "{{ k8s_template }}"
-    service_offering: "{{ k8s_instance_type }}"
-    ssh_key: "{{ ssh_key }}"
-    security_groups:
-    - '{{ k8s_security_group_name }}'
-    user_data: "{{ lookup('template', '../templates/k8s-master.j2') }}"
-  register: k8s_master
+  - name: Start k8s head node
+    ec2:
+      region: "{{ aws_region }}"
+      image: "{{ k8s_template }}"
+      instance_type: "{{ k8s_instance_type }}"
+      key_name: "{{ ssh_key }}"
+      group: "{{ k8s_security_group_name }}"
+      user_data: "{{ lookup('template', '../templates/k8s-head.j2') }}"
+      wait: yes
+    register: k8s_head
+ 
+  - debug: msg='k8s head IP is {{ item.public_ip }}'
+    with_items: k8s_head.instances
 
-- debug:
-    msg: 'k8s master IP is {{ k8s_master.default_ip }}'
-    verbosity: 2
+  - debug: msg='k8s head IP is {{ item.private_ip }}'
+    with_items: k8s_head.instances
 
-- name: Start k8s nodes
-  cs_instance:
-    name: "{{ k8s_node_prefix }}-node-{{ item }}"
-    template: "{{ k8s_template }}"
-    service_offering: "{{ k8s_instance_type }}"
-    ssh_key: "{{ ssh_key }}"
-    security_groups:
-    - '{{ k8s_security_group_name }}'
-    user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
-  with_sequence: count={{ k8s_num_nodes }}
-  register: k8s_nodes
+  - name: Add new instance to host group
+    add_host: hostname={{ item.public_ip }} groupname=k8s
+    with_items: k8s_head.instances
+
+  - name: Start k8s nodes
+    ec2:
+      region: "{{ aws_region }}"
+      image: "{{ k8s_template }}"
+      instance_type: "{{ k8s_instance_type }}"
+      key_name: "{{ ssh_key }}"
+      group: "{{ k8s_security_group_name }}"
+      user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
+      count: "{{ k8s_num_nodes }}"
+      wait: yes
+    register: ec2
+
+  - name: Add new instance to host group
+    add_host: hostname={{ item.public_ip }} groupname=k8s
+    with_items: ec2.instances
+
+  - name: Add new instance to host group
+    add_host: hostname={{ item.public_ip }} groupname=k8s_nodes
+    with_items: ec2.instances

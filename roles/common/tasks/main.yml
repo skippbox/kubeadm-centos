@@ -1,2 +1,2 @@
 ---
-- include: create_sshkey.yml
+  - include: create_sshkey.yml

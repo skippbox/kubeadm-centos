@@ -1,6 +1,0 @@
----
-  - include: delete_vm.yml
-  - include: delete_inv.yml
-  - include: delete_secgroup_rules.yml
-  - include: delete_secgroup.yml
-  - include: delete_context.yml

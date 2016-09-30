@@ -1,19 +1,19 @@
-- name: check if ssh key exists
-  stat:
-    path: "~/.ssh/id_rsa_{{ ssh_key }}"
-  register: stat_ssh_key
-  tags: sshkey
+  - name: Create EC2 SSH Key
+    ec2_key:
+      name: "{{ ssh_key }}"
+      region: "{{ aws_region }}"
+      state: present
+    register: ec2key
+    tags: sshkey
 
-- name: Create SSH Key
-  cs_sshkeypair:
-    name: "{{ ssh_key }}"
-  register: key
-  when: "{{ not stat_ssh_key.stat.exists }}"
-  notify: install ssh key
-  tags: sshkey
+  - debug: msg='private key is {{ ec2key.key.private_key }}'
+    when: ec2key.changed
+    tags: sshkey
+ 
+  - local_action: copy content="{{ ec2key.key.private_key }}" dest="~/.ssh/id_rsa_{{ ssh_key }}"
+    when: ec2key.changed
+    tags: sshkey
 
-- debug:
-    msg: 'private key is {{ key.private_key }}'
-    verbosity: 2
-  when: not key|skipped
-  tags: sshkey
+  - file: path="~/.ssh/id_rsa_{{ ssh_key }}" mode=0600
+    when: ec2key.changed
+    tags: sshkey

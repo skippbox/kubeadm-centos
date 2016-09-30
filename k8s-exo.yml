@@ -6,5 +6,5 @@
   - vars/secrets.yml
 
   roles:
-    - common
-    - k8s
+  - common
+  - k8s
