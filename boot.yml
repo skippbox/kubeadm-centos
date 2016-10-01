@@ -3,9 +3,6 @@
   vars:
     init_token: foobar.1234
   tasks:
-  - name: Disable selinux
-    selinux: state=disabled
-    become: true
   - name: Start Docker
     service: enabled=yes state=started name=docker
     become: true
@@ -21,9 +18,6 @@
     init_token: foobar.1234
   tags: nodes
   tasks:
-  - name: Disable selinux
-    selinux: state=disabled
-    become: true
   - name: Start Docker
     service: enabled=yes state=started name=docker
     become: true
