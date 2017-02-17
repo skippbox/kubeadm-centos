@@ -5,19 +5,21 @@
       instance_type: "{{ k8s_instance_type }}"
       key_name: "{{ ssh_key }}"
       group: "{{ k8s_security_group_name }}"
-      user_data: "{{ lookup('template', '../templates/k8s-head.j2') }}"
+      user_data: "{{ lookup('template', '../templates/k8s-master.j2') }}"
+      assign_public_ip: yes
+      vpc_subnet_id: "{{ vpc_id }}"
       wait: yes
     register: k8s_head
  
   - debug: msg='k8s head IP is {{ item.public_ip }}'
-    with_items: k8s_head.instances
+    with_items: "{{k8s_head.instances}}"
 
   - debug: msg='k8s head IP is {{ item.private_ip }}'
-    with_items: k8s_head.instances
+    with_items: "{{k8s_head.instances}}"
 
   - name: Add new instance to host group
     add_host: hostname={{ item.public_ip }} groupname=k8s
-    with_items: k8s_head.instances
+    with_items: "{{k8s_head.instances}}"
 
   - name: Start k8s nodes
     ec2:
@@ -29,12 +31,14 @@
       user_data: "{{ lookup('template', '../templates/k8s-node.j2') }}"
       count: "{{ k8s_num_nodes }}"
       wait: yes
+      assign_public_ip: yes
+      vpc_subnet_id: "{{ vpc_id }}"
     register: ec2
 
   - name: Add new instance to host group
     add_host: hostname={{ item.public_ip }} groupname=k8s
-    with_items: ec2.instances
+    with_items: "{{ec2.instances}}"
 
   - name: Add new instance to host group
     add_host: hostname={{ item.public_ip }} groupname=k8s_nodes
-    with_items: ec2.instances
+    with_items: "{{ec2.instances}}"

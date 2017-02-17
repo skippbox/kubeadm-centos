@@ -1,9 +1,10 @@
 # Update/replace this file with something appropriate to your environment
 ssh_key: k8s
+vpc_id: subnet-352352
 aws_region: eu-west-1
 k8s_version: 1.4.0
 k8s_num_nodes: 2
 k8s_security_group_name: k8s
 k8s_username: foobar
-k8s_template: ami-054bc176
+k8s_template: ami-cac6e6b9
 k8s_instance_type: m3.large

@@ -1,8 +1,9 @@
 # Create k8s context
 
 - name: Set context cluster
-  command: kubectl config set-cluster exo --server=https://{{ k8s_master.default_ip }}:443 --insecure-skip-tls-verify=true
+  command: kubectl config set-cluster exo --server=https://{{ item.public_ip }}:443 --insecure-skip-tls-verify=true
   tags: context
+  with_items: "{{k8s_head.instances}}"
 
 - name: Set context user
   command: kubectl config set-credentials exo --username={{ k8s_username }} --password={{ k8s_password}}

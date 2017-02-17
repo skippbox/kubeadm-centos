@@ -1,23 +1,26 @@
-#cloud-config
-write_files:
-  - path: /etc/yum.repos.d/kubernetes.repo
-    content: |
-      [kubernetes]
-      name=Kubernetes
-      baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
-      enabled=1
-      gpgcheck=1
-      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
-             https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+#!/bin/bash
 
-package_update: true
+apt-get update
 
-packages:
- - docker
- - kubelet
- - kubeadm
- - kubectl
- - kubernetes-cni
+apt-get install -y --no-install-recommends \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     software-properties-common
 
-power_state:
-  mode: reboot
+curl -fsSL https://apt.dockerproject.org/gpg | sudo apt-key add -
+
+add-apt-repository \
+       "deb https://apt.dockerproject.org/repo/ \
+       debian-$(lsb_release -cs) \
+       main"
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+apt-get update
+apt-get install -y docker-engine
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni
